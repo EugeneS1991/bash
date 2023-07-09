@@ -231,16 +231,15 @@ prompt_continue_default_no() {
 }
 
 deploy_production_server() {
-  if [[ "${policy_script_url}" == "''" ]]; then
-    policy_script_url=""
-  fi
+#  if [[ "${policy_script_url}" == "''" ]]; then
+#    policy_script_url=""
+#  fi
   echo "Deploying the production service to ${service_prefix}, press any key to begin..."
   project_id=$(gcloud config list --format 'value(core.project)')
   read -n 1 -s
   prod_url=$(gcloud run deploy ${service_prefix} --image=${IMG_URL} \
     --cpu=${cpu_limit} --allow-unauthenticated --min-instances=${min_instances} \
     --max-instances=${max_instances} --memory=${memory_limit} --region=${cur_region} \
-    --set-env-vars POLICY_SCRIPT_URL=${policy_script_url} \
     --set-env-vars GOOGLE_CLOUD_PROJECT=${project_id})
 }
 
