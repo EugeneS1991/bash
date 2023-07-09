@@ -238,9 +238,10 @@ deploy_production_server() {
   project_id=$(gcloud config list --format 'value(core.project)')
   read -n 1 -s
   prod_url=$(gcloud run deploy ${service_prefix} --image=${IMG_URL} \
-    --cpu=${cpu_limit} --allow-unauthenticated --min-instances=${min_instances} \
-    --max-instances=${max_instances} --memory=${memory_limit} --region=${cur_region} \
-    --set-env-vars GOOGLE_CLOUD_PROJECT=${project_id})
+  --cpu=${cpu_limit} --allow-unauthenticated --min-instances=${min_instances} \
+  --max-instances=${max_instances} --memory=${memory_limit} --region=${cur_region} \
+  --set-env-vars GOOGLE_CLOUD_PROJECT=${project_id} --format="value(status.url)")
+
 }
 
 echo "${WELCOME_TEXT}"
