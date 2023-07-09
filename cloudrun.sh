@@ -76,7 +76,7 @@ prompt_existing_service() {
     if [[ "${confirmation}" == "y" ]]; then
       config=$(get_config)
       if [[ ! -z ${config} ]]; then
-        cur_policy_script_url="$(echo "${config}" | jq -r ${CONFIG_ENV_PATH}' | select(.name | contains("POLICY_SCRIPT_URL")).value')"
+#        cur_policy_script_url="$(echo "${config}" | jq -r ${CONFIG_ENV_PATH}' | select(.name | contains("POLICY_SCRIPT_URL")).value')"
         cur_memory_limit="$(echo "${config}" | jq -r ${CONFIG_MEMORY_PATH})"
         cur_cpu_limit="$(echo "${config}" | jq -r ${CONFIG_CPU_PATH})"
         cur_min_instances="$(echo "${config}" | jq -r ${CONFIG_MIN_SCALE_PATH})"
@@ -94,32 +94,32 @@ prompt_existing_service() {
   done
 }
 
-prompt_policy_script_url() {
-  while true; do
-    suggested="$(generate_suggested "${cur_policy_script_url}" "Optional")"
-    printf "Policy Script URL (${suggested}): "
-    read policy_script_url
-
-    if [[ "${policy_script_url}" =~ ^[Nn][Oo][Nn][Ee]$ ]]; then
-      policy_script_url="''"
-    elif [[ "${policy_script_url}" == '""' ]]; then
-      policy_script_url="''"
-    fi
-
-    if [[ "$policy_script_url" == '?' ]]; then
-      echo "${POLICY_SCRIPT_HELP}"
-    elif [[ -z "${policy_script_url}" ]]; then
-      if [[ ! -z "${cur_policy_script_url}" && "${cur_policy_script_url}" != 'null' ]]; then
-        policy_script_url="${cur_policy_script_url}"
-      else
-        policy_script_url="''"
-      fi
-      break
-    else
-      break
-    fi
-  done
-}
+#prompt_policy_script_url() {
+#  while true; do
+#    suggested="$(generate_suggested "${cur_policy_script_url}" "Optional")"
+#    printf "Policy Script URL (${suggested}): "
+#    read policy_script_url
+#
+#    if [[ "${policy_script_url}" =~ ^[Nn][Oo][Nn][Ee]$ ]]; then
+#      policy_script_url="''"
+#    elif [[ "${policy_script_url}" == '""' ]]; then
+#      policy_script_url="''"
+#    fi
+#
+#    if [[ "$policy_script_url" == '?' ]]; then
+#      echo "${POLICY_SCRIPT_HELP}"
+#    elif [[ -z "${policy_script_url}" ]]; then
+#      if [[ ! -z "${cur_policy_script_url}" && "${cur_policy_script_url}" != 'null' ]]; then
+#        policy_script_url="${cur_policy_script_url}"
+#      else
+#        policy_script_url="''"
+#      fi
+#      break
+#    else
+#      break
+#    fi
+#  done
+#}
 
 prompt_memory() {
   while [[ ! "${memory_limit}" =~ ${MEMORY_LIMIT_REGEX} ||
@@ -247,7 +247,7 @@ deploy_production_server() {
 echo "${WELCOME_TEXT}"
 prompt_service_prefix
 prompt_existing_service
-prompt_policy_script_url
+#prompt_policy_script_url
 prompt_memory
 prompt_cpu_limit
 prompt_min_instances
@@ -256,7 +256,7 @@ prompt_max_instances
 echo ""
 echo "Your configured settings are"
 echo "Service Name: ${service_prefix}"
-echo "Policy Script URL: ${policy_script_url}"
+#echo "Policy Script URL: ${policy_script_url}"
 echo "Memory Per Instance: ${memory_limit}"
 echo "CPU Allocation Per Instance: ${cpu_limit}"
 echo "Minimum Number of Servers: ${min_instances}"
@@ -267,7 +267,8 @@ fi
 
 prompt_continue_default_no "${WISH_TO_CONTINUE}"
 
-if [[ "${policy_script_url}" == "${cur_policy_script_url}" &&
+if [[
+#  "${policy_script_url}" == "${cur_policy_script_url}" &&
   "${memory_limit}" == "${cur_memory_limit}" &&
   "${cpu_limit}" == "${cur_cpu_limit}" &&
   "${min_instances}" == "${cur_min_instances}" &&
