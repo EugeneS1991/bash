@@ -160,9 +160,7 @@ prompt_cpu_limit() {
 prompt_min_instances() {
   while [[ ! "${min_instances}" =~ ${POSITIVE_INT_OR_ZERO_REGEX} || \
     "${min_instances}" == '?' ]]; do
-    recommended="3"
-    suggested="$(\
-      generate_suggested "${cur_min_instances}" "Recommended: ${recommended}")"
+    suggested="$(generate_suggested "${cur_min_instances}" "Recommended: ${recommended}")"
     printf "Minimum Number of Servers (${suggested}): "
     read min_instances
     if [[ "${min_instances}" == '?' ]]; then
@@ -178,6 +176,7 @@ prompt_min_instances() {
     fi
   done
 }
+
 
 prompt_max_instances() {
   while [[ ! "${max_instances}" =~ ${POSITIVE_INT_REGEX} ||
