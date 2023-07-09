@@ -275,6 +275,7 @@ fi
 
 echo "As you wish."
 
+deploy_production_server
 
 echo ""
 echo "Your server deployment is complete."
