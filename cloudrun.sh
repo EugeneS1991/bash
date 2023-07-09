@@ -235,6 +235,7 @@ deploy_production_server() {
 }
 
 echo "${WELCOME_TEXT}"
+prompt_service_prefix
 prompt_existing_service
 prompt_policy_script_url
 prompt_memory
