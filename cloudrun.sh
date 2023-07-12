@@ -262,7 +262,7 @@ create_dataset() {
   echo "Create the dataset with name ${dataset_prefix}, press any key to begin..."
   project_id=$(gcloud config list --format 'value(core.project)')
   read -n 1 -s
-  bq.cmd --location=${region} mk \
+  bq --location=${region} mk \
   "${project_id}:${dataset_prefix}"
   read -n 1 -s
 }
