@@ -239,7 +239,7 @@ prompt_continue_default_no() {
 
 prompt_dataset_prefix() {
   while [[ -z "${dataset_prefix}" || "${dataset_prefix}" == '?' ]]; do
-    recommended="bq-streaming"
+    recommended="bq_streaming"
     suggested="$(
       generate_suggested "${cur_dataset_prefix}" "Recommended: ${recommended}"
     )"
@@ -264,7 +264,6 @@ create_dataset() {
   read -n 1 -s
   bq --location=${region} mk \
   "${project_id}:${dataset_prefix}"
-  read -n 1 -s
 }
 
 echo "${WELCOME_TEXT}"
@@ -284,7 +283,7 @@ echo "Your server deployment is complete."
 
 prompt_table_prefix() {
   while [[ -z "${table_prefix}" || "${table_prefix}" == '?' ]]; do
-    recommended="bq-streaming"
+    recommended="bq_streaming"
     suggested="$(
       generate_suggested "${cur_table_prefix}" "Recommended: ${recommended}"
     )"
@@ -305,12 +304,12 @@ prompt_table_prefix() {
 
 create_table() {
   echo "Create the table with name ${table_prefix}, press any key to begin..."
-    bq.cmd mk \
+    bq mk \
   --table \
   --time_partitioning_field event_date \
   "${dataset_prefix}.${table_prefix}" \
   "./stream_schema.json"
-  read -n 1 -s
+
 }
 echo ""
 echo "Next step create table"
