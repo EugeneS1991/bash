@@ -565,7 +565,7 @@ echo "Your server deployment is complete."
 echo ""
 echo "Production server test:"
 printf "${prod_url}/healthy"
-echo ""
+
 # ======== установка cloud run завершена =======================
 #=======================Начало создания статического IP========================
 
@@ -596,7 +596,6 @@ deploy_static_ip() {
   --global \
   --ip-version=IPV4\
   --network-tier=PREMIUM
-  read -n 1 -s
 }
 
 get_static_ip() {
@@ -605,6 +604,7 @@ get_static_ip() {
   --format="get(address)"
     )
 }
+echo ""
 echo "Create static external IP"
 prompt_continue_default_no "${WISH_TO_CONTINUE}"
 prompt_static_ip_prefix
@@ -672,7 +672,7 @@ deploy_certificate() {
 get_certificate() {
   cert_list=$(gcloud compute ssl-certificates describe ${cert_name} \
     --global\
-    ---format="get(name,managed.status, managed.domainStatus)")
+    --format="get(name,managed.status, managed.domainStatus)")
 }
 echo""
 echo "Create SSL-certificate"
