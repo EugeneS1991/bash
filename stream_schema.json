@@ -1,0 +1,266 @@
+[
+  {
+    "name": "event_date",
+    "type": "DATE",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "event_timestamp",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "event_name",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "session_id",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "event_params",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "fields": [
+      {
+        "name": "key",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "value",
+        "type": "RECORD",
+        "mode": "NULLABLE",
+        "fields": [
+          {
+            "name": "string_value",
+            "type": "STRING",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "int_value",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "float_value",
+            "type": "FLOAT",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "bool_value",
+            "type": "BOOLEAN",
+            "mode": "NULLABLE"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "user_id",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "user_pseudo_id",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "user_params",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "fields": [
+      {
+        "name": "key",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "value",
+        "type": "RECORD",
+        "mode": "NULLABLE",
+        "fields": [
+          {
+            "name": "string_value",
+            "type": "STRING",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "int_value",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "float_value",
+            "type": "FLOAT",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "bool_value",
+            "type": "BOOLEAN",
+            "mode": "NULLABLE"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "device",
+    "type": "RECORD",
+    "mode": "NULLABLE",
+    "fields": [
+      {
+        "name": "category",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "mobile_brand_name",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "mobile_model_name",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "operating_system",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "operating_system_version",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "browser",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "browser_version",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "is_bot",
+        "type": "BOOLEAN",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "user_agent",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "language",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  {
+    "name": "geo",
+    "type": "RECORD",
+    "mode": "NULLABLE",
+    "fields": [
+      {
+        "name": "country",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "region",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "city",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  {
+    "name": "traffic_source",
+    "type": "RECORD",
+    "mode": "NULLABLE",
+    "fields": [
+      {
+        "name": "source",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "medium",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "campaign",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "adgroup",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "term",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "content",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "gclid",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "dclid",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "wbraid",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "srsltid",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "gbraid",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "fblid",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  {
+    "name": "request_id",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "ip",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  }
+]
