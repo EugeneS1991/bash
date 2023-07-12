@@ -279,7 +279,7 @@ prompt_continue_default_no "${WISH_TO_CONTINUE}"
 echo "As you wish."
 echo ""
 create_dataset
-echo "Your server deployment is complete."
+echo "Your dataset deployment is complete."
 
 prompt_table_prefix() {
   while [[ -z "${table_prefix}" || "${table_prefix}" == '?' ]]; do
@@ -308,7 +308,7 @@ create_table() {
   --table \
   --time_partitioning_field event_date \
   "${dataset_prefix}.${table_prefix}" \
-  "./stream_schema.json"
+  "https://raw.githubusercontent.com/EugeneS1991/bash/main/stream_schema.json?token=GHSAT0AAAAAACE4S2V7UXB6KDULVUYCUAYCZFOJRVA"
 
 }
 echo ""
@@ -324,7 +324,7 @@ echo "As you wish."
 echo ""
 create_table
 echo ""
-echo "Your server deployment is complete."
+echo "Your table deployment is complete."
 
 
 # ===================начало установки Cloud Run =================
