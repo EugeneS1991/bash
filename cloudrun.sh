@@ -308,7 +308,7 @@ create_table() {
   --table \
   --time_partitioning_field event_date \
   "${dataset_prefix}.${table_prefix}" \
-  "./raw.githubusercontent.com/EugeneS1991/bash/main/stream_schema.json?token=GHSAT0AAAAAACE4S2V7UXB6KDULVUYCUAYCZFOJRVA"
+  "./stream_schema.json"
 
 }
 echo ""
