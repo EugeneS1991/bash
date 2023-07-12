@@ -33,6 +33,12 @@ CPU_LIMIT_REGEX="^[124]$"
 MEMORY_LIMIT_REGEX="^[1-9]+[0-9]*[MG][Bi]$"
 POSITIVE_INT_REGEX="^[1-9]+[0-9]*$"
 POSITIVE_INT_OR_ZERO_REGEX="^([1-9]+[0-9]*|0)$"
+
+IP_PREFIX_HELP="Enter the name that you want to call this address"
+
+DOMAIN_LIST_HELP="a single domain name or a comma-delimited list of domain names to use for this certificate"
+CERTIFICATE_NAME_HELP="a name for the global SSL certificate"
+
 trap "exit" INT
 set -e
 
@@ -44,6 +50,285 @@ get_config() {
   echo "$(gcloud run services describe ${service_prefix} --format=json)"
 }
 
+select_region() {
+    echo "Выберите регион для создания датасета в BigQuery:"
+    echo "[1] asia-east1"
+    echo "[2] asia-east2"
+    echo "[3] asia-northeast1"
+    echo "[4] asia-northeast2"
+    echo "[5] asia-northeast3"
+    echo "[6] asia-south1"
+    echo "[7] asia-south2"
+    echo "[8] asia-southeast1"
+    echo "[9] asia-southeast2"
+    echo "[10] australia-southeast1"
+    echo "[11] australia-southeast2"
+    echo "[12] europe-central2"
+    echo "[13] europe-north1"
+    echo "[14] europe-southwest1"
+    echo "[15] europe-west1"
+    echo "[16] europe-west12"
+    echo "[17] europe-west2"
+    echo "[18] europe-west3"
+    echo "[19] europe-west4"
+    echo "[20] europe-west6"
+    echo "[21] europe-west8"
+    echo "[22] europe-west9"
+    echo "[23] me-central1"
+    echo "[24] me-west1"
+    echo "[25] northamerica-northeast1"
+    echo "[26] northamerica-northeast2"
+    echo "[27] southamerica-east1"
+    echo "[28] southamerica-west1"
+    echo "[29] us-central1"
+    echo "[30] us-east1"
+    echo "[31] us-east4"
+    echo "[32] us-east5"
+    echo "[33] us-south1"
+    echo "[34] us-west1"
+    echo "[35] us-west2"
+    echo "[36] us-west3"
+    echo "[37] us-west4"
+    echo "[38] cancel"
+
+    echo "Введите номер региона: "
+    read region_number
+
+    case $region_number in
+      1)
+        region="asia-east1"
+        ;;
+      2)
+        region="asia-east2"
+        ;;
+      3)
+        region="asia-northeast1"
+        ;;
+      4)
+        region="asia-northeast2"
+        ;;
+      5)
+        region="asia-northeast3"
+        ;;
+      6)
+        region="asia-south1"
+        ;;
+      7)
+        region="asia-south2"
+        ;;
+      8)
+        region="asia-southeast1"
+        ;;
+      9)
+        region="asia-southeast2"
+        ;;
+      10)
+        region="australia-southeast1"
+        ;;
+      11)
+        region="australia-southeast2"
+        ;;
+      12)
+        region="europe-central2"
+        ;;
+      13)
+        region="europe-north1"
+        ;;
+      14)
+        region="europe-southwest1"
+        ;;
+      15)
+        region="europe-west1"
+        ;;
+      16)
+        region="europe-west12"
+        ;;
+      17)
+        region="europe-west2"
+        ;;
+      18)
+        region="europe-west3"
+        ;;
+      19)
+        region="europe-west4"
+        ;;
+      20)
+        region="europe-west6"
+        ;;
+      21)
+        region="europe-west8"
+        ;;
+      22)
+        region="europe-west9"
+        ;;
+      23)
+        region="me-central1"
+        ;;
+      24)
+        region="me-west1"
+        ;;
+      25)
+        region="northamerica-northeast1"
+        ;;
+      26)
+        region="northamerica-northeast2"
+        ;;
+      27)
+        region="southamerica-east1"
+        ;;
+      28)
+        region="southamerica-west1"
+        ;;
+      29)
+        region="us-central1"
+        ;;
+      30)
+        region="us-east1"
+        ;;
+      31)
+        region="us-east4"
+        ;;
+      32)
+        region="us-east5"
+        ;;
+      33)
+        region="us-south1"
+        ;;
+      34)
+        region="us-west1"
+        ;;
+      35)
+        region="us-west2"
+        ;;
+      36)
+        region="us-west3"
+        ;;
+      37)
+        region="us-west4"
+        ;;
+      38)
+        echo "Отменено."
+        exit 1
+        ;;
+      *)
+        echo "Недопустимый номер региона."
+        exit 1
+        ;;
+    esac
+
+#    echo "Выбран регион: $region"
+    # Дальнейшая обработка или передача региона в другую функцию
+}
+prompt_continue_default_no() {
+  while true; do
+    printf "$1"
+    read confirmation
+    confirmation="$(echo "${confirmation}" | tr '[:upper:]' '[:lower:]')"
+    if [[ -z "${confirmation}" || "${confirmation}" == 'n' ]]; then
+      exit 0
+    fi
+    if [[ "${confirmation}" == "y" ]]; then
+      break
+    fi
+  done
+}
+
+
+
+
+
+prompt_dataset_prefix() {
+  while [[ -z "${dataset_prefix}" || "${dataset_prefix}" == '?' ]]; do
+    recommended="bq-streaming"
+    suggested="$(
+      generate_suggested "${cur_dataset_prefix}" "Recommended: ${recommended}"
+    )"
+    printf "Dataset Name (${suggested}): "
+    read dataset_prefix
+
+    if [[ "${dataset_prefix}" == '?' ]]; then
+      echo "${SERVICE_PREFIX_HELP}"
+    elif [[ -z "${dataset_prefix}" ]]; then
+      if [[ ! -z "${cur_dataset_prefix}" ]]; then
+        dataset_prefix="${cur_dataset_prefix}"
+      else
+        dataset_prefix="${recommended}"
+      fi
+    fi
+  done
+}
+
+create_dataset() {
+  echo "Create the dataset with name ${dataset_prefix}, press any key to begin..."
+  project_id=$(gcloud config list --format 'value(core.project)')
+  read -n 1 -s
+  bq.cmd --location=${region} mk \
+  "${project_id}:${dataset_prefix}"
+  read -n 1 -s
+}
+
+echo "${WELCOME_TEXT}"
+echo""
+prompt_dataset_prefix
+select_region
+echo ""
+echo "Your configured settings are"
+echo "Dataset Name: ${dataset_prefix}"
+echo "Dataset Region: ${region}"
+echo ""
+prompt_continue_default_no "${WISH_TO_CONTINUE}"
+echo "As you wish."
+echo ""
+create_dataset
+echo "Your server deployment is complete."
+
+prompt_table_prefix() {
+  while [[ -z "${table_prefix}" || "${table_prefix}" == '?' ]]; do
+    recommended="bq-streaming"
+    suggested="$(
+      generate_suggested "${cur_table_prefix}" "Recommended: ${recommended}"
+    )"
+    printf "Table Name (${suggested}): "
+    read table_prefix
+
+    if [[ "${table_prefix}" == '?' ]]; then
+      echo "${SERVICE_PREFIX_HELP}"
+    elif [[ -z "${table_prefix}" ]]; then
+      if [[ ! -z "${cur_table_prefix}" ]]; then
+        table_prefix="${cur_table_prefix}"
+      else
+        table_prefix="${recommended}"
+      fi
+    fi
+  done
+}
+
+create_table() {
+  echo "Create the table with name ${table_prefix}, press any key to begin..."
+    bq.cmd mk \
+  --table \
+  --time_partitioning_field event_date \
+  "${dataset_prefix}.${table_prefix}" \
+  "./stream_schema.json"
+  read -n 1 -s
+}
+echo ""
+echo "Next step create table"
+prompt_continue_default_no "${WISH_TO_CONTINUE}"
+prompt_table_prefix
+echo ""
+echo "Your configured settings are"
+echo "Table Name: ${table_prefix}"
+echo ""
+prompt_continue_default_no "${WISH_TO_CONTINUE}"
+echo "As you wish."
+echo ""
+create_table
+echo ""
+echo "Your server deployment is complete."
+
+
+# ===================начало установки Cloud Run =================
 prompt_service_prefix() {
   while [[ -z "${service_prefix}" || "${service_prefix}" == '?' ]]; do
     recommended="gtm-server"
@@ -216,20 +501,6 @@ prompt_max_instances() {
   done
 }
 
-prompt_continue_default_no() {
-  while true; do
-    printf "$1"
-    read confirmation
-    confirmation="$(echo "${confirmation}" | tr '[:upper:]' '[:lower:]')"
-    if [[ -z "${confirmation}" || "${confirmation}" == 'n' ]]; then
-      exit 0
-    fi
-    if [[ "${confirmation}" == "y" ]]; then
-      break
-    fi
-  done
-}
-
 deploy_production_server() {
 #  if [[ "${policy_script_url}" == "''" ]]; then
 #    policy_script_url=""
@@ -240,11 +511,12 @@ deploy_production_server() {
   prod_url=$(gcloud run deploy ${service_prefix} --image=${IMG_URL} \
   --cpu=${cpu_limit} --allow-unauthenticated --min-instances=${min_instances} \
   --max-instances=${max_instances} --memory=${memory_limit} --region=${cur_region} \
-  --set-env-vars GOOGLE_CLOUD_PROJECT=${project_id} --format="value(status.url)")
-
+  --set-env-vars project_id=${project_id} --format="value(status.url)" \
+  --set-env-vars dataset_id=${dataset_prefix} --format="value(status.url)" \
+  --set-env-vars table_id=${table_prefix} --format="value(status.url)" )
 }
 
-echo "${WELCOME_TEXT}"
+
 prompt_service_prefix
 prompt_existing_service
 #prompt_policy_script_url
@@ -252,6 +524,7 @@ prompt_memory
 prompt_cpu_limit
 prompt_min_instances
 prompt_max_instances
+
 
 echo ""
 echo "Your configured settings are"
@@ -293,5 +566,148 @@ echo "Your server deployment is complete."
 echo ""
 echo "Production server test:"
 printf "${prod_url}/healthy"
+echo ""
+# ======== установка cloud run завершена =======================
+#=======================Начало создания статического IP========================
+
+prompt_static_ip_prefix() {
+  while [[ -z "${ip_prefix}" || "${ip_prefix}" == '?' ]]; do
+    recommended="bq-streaming-static-ip"
+    suggested="$(
+      generate_suggested "${cur_ip_prefix}" "Recommended: ${recommended}"
+    )"
+    printf "Adress Name (${suggested}): "
+    read ip_prefix
+
+    if [[ "${ip_prefix}" == '?' ]]; then
+      echo "${IP_PREFIX_HELP}"
+    elif [[ -z "${ip_prefix}" ]]; then
+      if [[ ! -z "${cur_ip_prefix}" ]]; then
+        ip_prefix="${cur_ip_prefix}"
+      else
+        ip_prefix="${recommended}"
+      fi
+    fi
+  done
+}
+
+deploy_static_ip() {
+  echo "Deploying the static IP name ${ip_prefix}, press any key to begin..."
+  gcloud compute addresses create ${ip_prefix}\
+  --global \
+  --ip-version=IPV4\
+  --network-tier=PREMIUM
+  read -n 1 -s
+}
+
+get_static_ip() {
+  ip_address=$(gcloud compute addresses describe ${ip_prefix} \
+  --global \
+  --format="get(address)"
+    )
+}
+echo "Create static external IP"
+prompt_continue_default_no "${WISH_TO_CONTINUE}"
+prompt_static_ip_prefix
+echo ""
+echo "Your configured settings are"
+echo "Service Name: ${ip_prefix}"
+prompt_continue_default_no "${WISH_TO_CONTINUE}"
+echo "As you wish."
+echo ""
+deploy_static_ip
+echo""
+echo "Your ip deployment is complete."
+get_static_ip
+echo ""
+echo "Your ip is ${ip_address} complete."
+echo ""
+#====================конец установки статичного ip ===========================
+#создание сертификата Create an SSL certificate
+#
+get_certificate_name() {
+  while [[ -z "${cert_name}" || "${cert_name}" == '?' ]]; do
+    recommended="bq-streaming-cert"
+    suggested="$(
+      generate_suggested "${cur_cert_name}" "Recommended: ${recommended}"
+    )"
+    printf "Adress Name (${suggested}): "
+    read cert_name
+
+    if [[ "${cert_name}" == '?' ]]; then
+      echo "${CERTIFICATE_NAME_HELP}"
+    elif [[ -z "${cert_name}" ]]; then
+      if [[ ! -z "${cur_cert_name}" ]]; then
+        cert_name="${cur_cert_name}"
+      else
+        cert_name="${recommended}"
+      fi
+    fi
+  done
+}
+
+get_domain_list() {
+  while [[ -z "${domain_list}" || "${domain_list}" == '?' ]]; do
+    printf "Domain Name: "
+    read domain_list
+
+    if [[ "${domain_list}" == '?' ]]; then
+      echo "${DOMAIN_LIST_HELP}"
+    elif [[ -z "${domain_list}" ]]; then
+      if [[ ! -z "${cur_domain_list}" ]]; then
+        domain_list="${cur_domain_list}"
+      fi
+    fi
+  done
+}
+
+
+deploy_certificate() {
+  echo "Deploying the certificat to ${cert_name}, press any key to begin..."
+  gcloud compute ssl-certificates create ${cert_name}\
+  --global \
+  --domains=${domain_list}
+  read -n 1 -s
+}
+
+get_certificate() {
+  cert_list=$(gcloud compute ssl-certificates describe ${cert_name} \
+    --global\
+    ---format="get(name,managed.status, managed.domainStatus)")
+}
+echo""
+echo "Create SSL-certificate"
+prompt_continue_default_no "${WISH_TO_CONTINUE}"
+get_certificate_name
+get_domain_list
+echo ""
+echo "Your configured settings are"
+echo "Certificate Name: ${cert_name}"
+echo "Domain List: ${domain_list}"
+prompt_continue_default_no "${WISH_TO_CONTINUE}"
+echo "As you wish."
+echo ""
+deploy_certificate
+echo""
+echo "Your SSL certificate deployment is complete."
+get_certificate
+echo ""
+echo "Your certificate is ${cert_list} complete."
+echo ""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 echo ""
 exit 0
